@@ -1,1 +1,2 @@
-# lazymath\n A Python lazy mathematics library
+# lazymath
+A Python lazy mathematics library
