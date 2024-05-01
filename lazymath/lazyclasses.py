@@ -13,6 +13,8 @@ __all__ = [
 ]
 
 
+# TODO: Mixiny żeby isinstance(LazyVal(3), number) zwracało true. Specjalna klasa LazyNum?
+
 class NotEvaluatedType:
     """Base class of the NotEvaluated singleton.
     (well, if you explicitly make another instance it won't be a singleton)"""
