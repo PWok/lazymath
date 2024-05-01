@@ -3,3 +3,6 @@
 __pycache__
 .venv/
 .mutmut-cache
+
+# remove this later
+pyproject.toml 
