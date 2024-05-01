@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
-from functools import wraps
 from math import prod
-from typing import Callable, TypeVar, Generic
+from typing import Callable
 
 
 __all__ = [
@@ -12,9 +11,6 @@ __all__ = [
     "LazyFuncFactory",
     "LazyNeg",
 ]
-
-
-T = TypeVar("T")
 
 
 class NotEvaluatedType:
@@ -31,22 +27,27 @@ class NotEvaluatedType:
 NotEvaluated = NotEvaluatedType()
 
 
-class LazyAbstract(ABC, Generic[T]):
-    """Abstract Base Class for Lazy classes."""
+class LazyAbstract(ABC):
+    """Abstract Base Class for Lazy classes.
+    
+    Classes derived from this can raise Exceptions. For example even though this implements __int__
+    calling something like `int(LazyVal([1,2,3]))` will raise the same* exception as int([1,2,3])
+        (* the traceback will actually differ -- it will include the LazyAbstract.__int__ method)
+    """
 
     __slots__ = ("_value",)
 
     def __init__(self) -> None:
-        self._value: T = NotEvaluated  # type: ignore
+        self._value = NotEvaluated  # type: ignore
 
-    def eval(self) -> T:
+    def eval(self):
         """Return the value this Lazy expresion evaluates to. If it's not cached calculate it."""
         if isinstance(self._value, NotEvaluatedType):
             self._value = self.calculate()
         return self._value
 
     @abstractmethod
-    def calculate(self) -> T:
+    def calculate(self):
         """Calculate and return the returned value of Lazy expression. Do not use cache."""
         raise NotImplementedError
 
@@ -140,8 +141,29 @@ class LazyAbstract(ABC, Generic[T]):
     def __rmatmul__(self, other):
         raise NotImplementedError
 
+    # TODO skipped a few here, come back later
+
     def __neg__(self):
         return -self.eval()  # type: ignore
+
+    # TODO skipped a few here, come back later
+
+    def __int__(self):
+        return int(self.eval())
+    def __float__(self):
+        return float(self.eval())
+    def __complex__(self):
+        return complex(self.eval())
+    def __index__(self):
+        return int(self)
+    def __round__(self, ndigits=None):
+        return round(float(self), ndigits)
+    def __trunc__(self):
+        return float(self).__trunc__()
+    def __floor__(self):
+        return float(self).__floor__()
+    def __ceil__(self):
+        return float(self).__ceil__()
 
 
 class LazyVal(LazyAbstract):
